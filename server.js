@@ -7,11 +7,12 @@ var expressSession = require('express-session');
 var router = require('./module/routing').routing;
 
 var app = express();
+var port = process.env.PORT || 3000;
 
 app.set('views', __dirname+'/game/views');
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
-app.set('port', 3000);
+app.set('port', port);
 app.use(static(__dirname+'/game'));
 app.use(cookieParser());
 app.use(expressSession({

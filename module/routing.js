@@ -4,10 +4,10 @@ var database;
 var router = express.Router();
 
 function connectDB(){
-    var databaseUrl = 'mongodb://localhost:27017/local';
+    var databaseUrl = process.env.MONGODB_URL || 'mongodb://localhost:27017/';
     MongoClient.connect(databaseUrl, {useUnifiedTopology: true},function(err, db){
         if(err) throw err;
-        database = db.db('local');
+        database = db.db('userlist');
         console.log('Success to connecting Database!');
     });
 }

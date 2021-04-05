@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <title>Hit the Stone</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </header>
+    <body>
+        <div class = "container-fluid">
+            <header>
+                <div class = "row bg-dark text-white text-center" style = "padding:10px;">
+                    <div class = "col-10">
+                        <h5 class = "align-middle">🥌 Bubble Shot!</h5>
+                    </div>
+                     <div class = "col">
+                         <% if(!session.user){ %>
+                        <a href = "/login"><button type="button" class="btn btn-outline-primary">SIGN IN</button></a>
+                        <a href = "/register"><button type="button" class="btn btn-outline-primary">SIGN UP</button></a>
+                        <% } else{%>
+                            <a href = "/process/logout"><button type="button" class="btn btn-outline-primary">LOGOUT</button></a>
+                        <% }%>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <div class = "container">
+            <div class = "row">
+                <div class = "col-5">
+                    <h5 class = "text-center">Gallery</h5>
+                    <div id="carouselExampleControls" class="carousel carousel-dark slide" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <a href = "https://www.youtube.com/watch?v=LPQK0Soa7CE"><img src="/img/dog.png" class="d-block w-100" alt="..."></a>
+                            </div>
+                            <div class="carousel-item">
+                                <iframe id="ytplayer1" type="text/html" width="450" height="310"
+                                src="https://www.youtube.com/embed/sEaH-WtdkxQ?autoplay=0"
+                                frameborder="0"></iframe>
+                            </div>
+                            <div class="carousel-item">
+                                <iframe id="ytplayer1" type="text/html" width="450" height="310"
+                                src="https://www.youtube.com/embed/1KPAIQPph78?autoplay=0"
+                                frameborder="0"></iframe>
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>
+                <div class = "col">
+                    <h5 class = "text-center">Ranking</h5>
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nation</th>
+                            <th scope="col">Nickname</th>
+                            <th scope="col">Pop</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row">1</th>
+                            <td>🇰🇷</td>
+                            <td>test01</td>
+                            <td>15</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">2</th>
+                            <td>🇰🇷</td>
+                            <td>test02</td>
+                            <td>3</td>
+                          </tr>
+                          <tr>
+                            <th scope="row">3</th>
+                            <td>🇰🇷</td>
+                            <td>test03</td>
+                            <td>2</td>
+                          </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class = "row">
+                <div class = "col text-center">
+                    <p>This is clone of <a href = "https://surviv.io/">surviv.io</a> made by Stynel for Study</p>
+                    <a href="/game" class="btn btn-success btn-md <% if(!session.user){ %> disabled <% } %>" role="button" <% if(!session.user){ %> aria-disabled="true" <% } %>>GAME START!</a>
+                    <a href="/" class="btn btn-success btn-md <% if(!session.user){ %> disabled <% } %>" role="button" <% if(!session.user){ %> aria-disabled="true" <% } %>>Making Room!</a>
+                </div>
+            </div>
+        </div>
+        <div class = "container">
+            <footer>
+                STAN LOONA
+            </footer>
+        </div>
+    </body>
+</html>

@@ -12,18 +12,3 @@ function drawBG(){
     ctx.fillStyle = "green";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
-
-document.body.addEventListener('keydown', (e)=>{
-    inputedKey = e.key;
-})
-
-function update(){
-    if(inputedKey != null){
-        console.log(inputedKey);
-        inputedKey = null;
-    }
-    setTimeout(update, 64/1000);
-}
-
-//update();
-

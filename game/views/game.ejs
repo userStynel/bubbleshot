@@ -72,6 +72,7 @@
                 hpbar.setAttribute('style', `width: ${player.health}%`);
                 hpbar.textContent = player.health;
             }
+
             canvas.addEventListener('click', (e)=>{
                 let mousePointer = new Vector2(e.offsetX, e.offsetY);
                 let dir = mousePointer.sub(player.pos).unit();
@@ -107,15 +108,18 @@
                 myInfo = setting.me;
                 othersInfo = setting.other;
                 player = new Player(myInfo.x, myInfo.y, nickname, myInfo.color);
-                drawBG();
+                //drawBG();
+                ctx.save();
+                ctx.translate(setting.me.x-canvas.width/2,setting.me.y-canvas.height/2);
+                app.runLoop();
                 player.draw();
-                
                 
                 for(let key of Object.keys(othersInfo)){
                     let other = othersInfo[key];
                     let op = new Player(other.x, other.y, '', other.color);
                     op.draw();
                 }
+                ctx.restore();
             });
 
             socket.on('chat', function(message_node){
@@ -128,7 +132,10 @@
             });
 
             socket.on('update', (setting)=>{
-                drawBG();
+                //drawBG();
+                ctx.save();
+                ctx.translate(setting.me.x-canvas.width/2,setting.me.y-canvas.height/2);
+                app.runLoop();
                 player.setPos(setting.me.x, setting.me.y);
                 player.setHealth(setting.me.health);
                 player.draw();
@@ -143,6 +150,7 @@
                     let bo = new Bullet(bullet.pos.x, bullet.pos.y, bullet.dir.x, bullet.dir.y, bullet.owner);
                     bo.draw();
                 }
+                ctx.restore();
             });
 
             // socket.on('newuser', (setting)=>{
@@ -163,6 +171,18 @@
         </script>
         <script src = "/script/character.js"></script>
         <script src = "/script/game.js"></script>
+        <script src="/script/mapgen/constant.js"></script>
+        <script type="text/javascript" src="/script/mapgen/math.js"></script>
+        <script type="text/javascript" src="/script/mapgen/noisegenerator.js"></script>
+        <script type="text/javascript" src="/script/mapgen/terraingenerator.js"></script>
+        <script type="text/javascript" src="/script/mapgen/mesh.js"></script>
+        <script type="text/javascript" src="/script/mapgen/pixel.js"></script>
+        <script type="text/javascript" src="/script/mapgen/chunk.js"></script>
+        <script type="text/javascript" src="/script/mapgen/chunkmanager.js"></script>
+        <script type="text/javascript" src="/script/mapgen/world.js"></script>
+        <script type="text/javascript" src="/script/mapgen/renderer.js"></script>
+        <script type="text/javascript" src="/script/mapgen/application.js"></script>
+        <script type="text/javascript" src="/script/mapgen/main.js"></script>
         <% }%>
     </body>
 </html>

@@ -11,9 +11,13 @@ class Application {
     runLoop() {
         //this.updateFPS()
         this.camera.move(myInfo.x, myInfo.y);
+        //console.log(this.camera);
         this.world.loadChunks(this.camera)
         this.world.draw(this.renderer)
         this.renderer.render(this.camera)
         //requestAnimationFrame(this.runLoop)
+    }
+    checkPlayerTile(pos){
+        return this.world.checkPlayerTile(pos);
     }
 }

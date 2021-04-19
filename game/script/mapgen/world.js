@@ -51,4 +51,13 @@ class World {
             this.loadDistance = 2
         }
     }
+    checkPlayerTile(pos){
+        let x = parseInt(pos.x / CHUNK_SIZE);
+        let y = parseInt(pos.y / CHUNK_SIZE);
+        let ck = this.chunkManager.getChunk(x * CHUNK_SIZE, y * CHUNK_SIZE);
+        let fx = Math.floor(pos.x - x*CHUNK_SIZE);
+        let fy = Math.floor(pos.y - y*CHUNK_SIZE);
+        // pos.x - x*CHUNK_SIZE, pos.y - y*CHUNK_SIZE
+        return ck.pixels[fy * CHUNK_SIZE + fx].type;
+    }
 }

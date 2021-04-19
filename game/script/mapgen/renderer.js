@@ -12,9 +12,9 @@ class Renderer{
             const mesh = this.meshes[iMesh]
             const cameraViewX = camera.position.x - canvas.width / 2
             const cameraViewZ = camera.position.z - canvas.height / 2
-            const meshX = parseInt(mesh.position.x);
-            const meshZ = parseInt(mesh.position.z);
-            ctx.putImageData(mesh.imgData, meshX, meshZ)
+            const meshX = parseInt(mesh.position.x) - cameraViewX;
+            const meshZ = parseInt(mesh.position.z) - cameraViewZ;
+            ctx.putImageData(mesh.imgData, meshX, meshZ);
         }
         this.meshes = []
     }

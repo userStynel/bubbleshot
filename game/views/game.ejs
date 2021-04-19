@@ -22,9 +22,15 @@
                 If you want to play this game, You should login first!<br><a href="/" class="alert-link">Go to main</a>
             </div>
         <% } else{%>
-        <div class="progress" style = "width: 25%">
-            <div id = "hpbar" class="progress-bar bg-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100</div>
+        <div style = "display:flex"> 
+            <div class="progress" style = "width: 22%; margin-right:1%; margin-left: 1%">
+                <div id = "hpbar" class="progress-bar bg-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100</div>
+            </div>
+            <div class="progress" style = "width: 22%">
+                <div id = "o2bar" class="progress-bar bg-info" role="progressbar" style="width: 100%; display: none;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100</div>
+            </div>
         </div>
+
         <div style = "display:flex;" id = 'browntiggerfather'>
             <canvas id = 'canvas'></canvas>
             <div id = 'browntigger'>
@@ -43,6 +49,7 @@
         </div>
         <script>
             var nickname = "<%= session.user.nickname %>";
+            
             function serverDisconnect(){
                 let canvas = document.getElementById('canvas');
                 let bt = document.getElementById('browntigger');
@@ -58,6 +65,7 @@
         
         <script src = "/script/socket.io.js"></script>
         <script>
+            var seed, noiseGenerator, camera, renderer, app;
             var text = document.getElementById('text');
             var chatBox = document.getElementById('chatBox');
             var sendBtn = document.getElementById('sendBtn');
@@ -67,23 +75,74 @@
             var myInfo;
             var othersInfo;
 
+            function drawFence(gameStatus){
+                let mapCen = gameStatus.center;
+                let mapRadius = gameStatus.radius;
+                ctx.strokeStyle = "white";
+                ctx.beginPath();
+                ctx.arc(mapCen.x, mapCen.y, mapRadius, 0, Math.PI*2);
+                ctx.stroke();
+                ctx.closePath();
+            }
+
             function hpbarDraw(){
+                let o2bar = document.getElementById('o2bar');
                 hpbar.setAttribute('aria-valuenow', player.health);
-                hpbar.setAttribute('style', `width: ${player.health}%`);
-                hpbar.textContent = player.health;
+                hpbar.setAttribute('style', `width: ${Math.floor(player.health)}%`);
+                hpbar.textContent = Math.floor(player.health);
+                o2bar.setAttribute('aria-value', player.survivtime);
+                o2bar.setAttribute('style', `width: ${Math.floor(player.survivtime)}%`);
+                o2bar.textContent = Math.floor(player.survivtime);
+
+            }
+
+            function checkValidKey(e){
+                /*
+                    left: 37 || up: 38 || right: 39 || down: 40
+                    a: 65 || w: 87 || d: 68 || s: 83
+                    spacebar: 32
+                */
+                let arrowKey = new Array(37, 38, 39, 40);
+                let wasdKey = new Array(87, 65, 83, 68);
+                let spacebar = 32;
+                let ret;
+                ret =  (text !== document.activeElement && (arrowKey.includes(e.keyCode))|| (wasdKey.includes(e.keyCode)));
+                if(e.keyCode == 32){
+                    if(app.checkPlayerTile({x: player.pos.x, y:player.pos.y})== 2){
+                        let o2bar = document.getElementById("o2bar");
+                        if(!player.underwater)
+                            o2bar.style.display =  'block';
+                        else
+                            o2bar.style.display = 'none';
+
+                        ret |= true;
+                    }
+                    else ret |= false;
+                }
+                return ret;
             }
 
             canvas.addEventListener('click', (e)=>{
                 let mousePointer = new Vector2(e.offsetX, e.offsetY);
+                mousePointer = mousePointer.add(player.pos.sub(new Vector2(canvas.width/2, canvas.height/2)));
                 let dir = mousePointer.sub(player.pos).unit();
                 let bullet = new Bullet(player.pos.x, player.pos.y, dir.x, dir.y, player.nickname);
-                console.log(bullet);
-                socket.emit('shooting', JSON.stringify(bullet));
+                let info = {
+                    socket: socket.id,
+                    bullet: JSON.stringify(bullet)
+                }
+                socket.emit('shooting', info);
             });
 
             document.body.addEventListener('keydown', (e)=>{
-                if(text !== document.activeElement && (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40 || e.keyCode ==  87 || e.keyCode == 65 || e.keyCode == 83 || e.keyCode == 68))  
-                    socket.emit('moving', e.keyCode);
+                if(checkValidKey(e)){
+                    let inputNode = {
+                        player: nickname,
+                        socket: socket.id,
+                        code: e.keyCode
+                    };
+                    socket.emit('input', inputNode);
+                }
             });
 
             function sendMessage(){
@@ -103,17 +162,24 @@
                 socket.close();
             });
             
-            socket.on('initialsetting', (setting)=>{
-                console.log(setting);
-                myInfo = setting.me;
-                othersInfo = setting.other;
+            socket.on('initialsetting', (initialInfo)=>{
+                let gameStatus = initialInfo.gameStatus;
+                seed = initialInfo.seed;
+
+                console.log(initialInfo);
+                myInfo = gameStatus.me;
+                othersInfo = gameStatus.others;
+                noiseGenerator = new NoiseGenerator(seed);
+                camera = new Camera({x: 1362, z: 1825});
+                renderer = new Renderer();
+                app = new Application('', renderer, noiseGenerator, camera);
                 player = new Player(myInfo.x, myInfo.y, nickname, myInfo.color);
-                //drawBG();
+
                 ctx.save();
-                ctx.translate(setting.me.x-canvas.width/2,setting.me.y-canvas.height/2);
+                ctx.translate(0, 0);
+                ctx.translate(canvas.width/2-myInfo.x, canvas.height/2-myInfo.y);
                 app.runLoop();
                 player.draw();
-                
                 for(let key of Object.keys(othersInfo)){
                     let other = othersInfo[key];
                     let op = new Player(other.x, other.y, '', other.color);
@@ -131,43 +197,32 @@
                 chatBox.appendChild(item);
             });
 
-            socket.on('update', (setting)=>{
-                //drawBG();
+            socket.on('update', (gameStatus)=>{
+                myInfo = gameStatus.me;
+                player.setPos(myInfo.x, myInfo.y);
+                player.setHealth(myInfo.health);
+                player.setServivtime(myInfo.survivtime);
+                player.underwater = myInfo.underwater;
                 ctx.save();
-                ctx.translate(setting.me.x-canvas.width/2,setting.me.y-canvas.height/2);
+                ctx.translate(canvas.width/2-myInfo.x, canvas.height/2-myInfo.y);
                 app.runLoop();
-                player.setPos(setting.me.x, setting.me.y);
-                player.setHealth(setting.me.health);
+                drawFence(gameStatus);
                 player.draw();
                 hpbarDraw();
-                othersInfo = setting.other;
+                othersInfo = gameStatus.others;
                 for(let key of Object.keys(othersInfo)){
                     let other = othersInfo[key];
                     let op = new Player(other.x, other.y, '', other.color);
-                    op.draw();
+                    let distance = player.pos.sub(op.pos).mag();
+                    if(!other.underwater || (app.checkPlayerTile({x: player.pos.x, y:player.pos.y})== 2) && distance <= 150)
+                        op.draw();
                 }
-                for(let bullet of setting.bullet){
+                for(let bullet of gameStatus.bullet){
                     let bo = new Bullet(bullet.pos.x, bullet.pos.y, bullet.dir.x, bullet.dir.y, bullet.owner);
                     bo.draw();
                 }
                 ctx.restore();
             });
-
-            // socket.on('newuser', (setting)=>{
-            //     othersInfo[setting.nickname] = setting;
-            //     var other = new Player(setting.x, setting.y, 'other', setting.color);
-            //     other.draw();
-            // });
-            
-            // socket.on('exit', (client_info)=>{
-            //     delete othersInfo[client_info.nickname];
-            //     drawBG();
-            //     player.draw();
-            //     for(var other of othersInfo){
-            //         var op = new Player(other.x, other.y, 'other', other.color);
-            //         op.draw();
-            //     }
-            // });
         </script>
         <script src = "/script/character.js"></script>
         <script src = "/script/game.js"></script>
@@ -182,7 +237,6 @@
         <script type="text/javascript" src="/script/mapgen/world.js"></script>
         <script type="text/javascript" src="/script/mapgen/renderer.js"></script>
         <script type="text/javascript" src="/script/mapgen/application.js"></script>
-        <script type="text/javascript" src="/script/mapgen/main.js"></script>
         <% }%>
     </body>
 </html>

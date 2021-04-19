@@ -46,6 +46,15 @@ router.route('/process/logout').get(function(req, res){
         res.redirect('/');
     });
 });
+
+router.route('/process/makeroom').get(function(req, res){
+    var isPublic, maxPlayer;
+    var room;
+    isPublic = req.query.isPublic;
+    maxPlayer = req.query.maxPlayer;
+    room = makingRoom(isPublic, maxPlayer);
+});
+
 router.route('/game').get(function(req, res){
     res.render('game', {session: req.session});
 });

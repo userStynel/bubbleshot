@@ -9,6 +9,8 @@ canvas.height = 512;
 playerRadius = 15;
 
 function drawBG(){
+    ctx.save();
     ctx.fillStyle = "green";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
 }

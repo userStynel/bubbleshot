@@ -31,6 +31,8 @@ class Player{
     constructor(x, y, nickname, color){
         this.pos = new Vector2(x, y);
         this.health = 100;
+        this.underwater = false;
+        this.survivtime = 100;
         this.nickname = nickname;
         this.color = color;
     }
@@ -40,6 +42,9 @@ class Player{
     }
     setHealth(health){
         this.health = health;
+    }
+    setServivtime(time){
+        this.survivtime = time;
     }
     draw(){
         ctx.beginPath();

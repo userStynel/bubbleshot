@@ -1,6 +1,6 @@
 const FRAME_RATE = 32;
 const velocity = 5;
-const bulletVelocity = 3;
+const bulletVelocity = 1500;
 
 class Room{
    constructor(id, ispublic, maxPlayer){
@@ -49,8 +49,8 @@ class Room{
         clearInterval(this.intervalID);
     }
     GameLoop(){
-        if(this.flowframe % (FRAME_RATE * 5) == 0 && this.mapRadius > 50){
-            this.mapRadius -= 50;
+        if(this.flowframe % (FRAME_RATE * 30) <= FRAME_RATE*5 && this.mapRadius > 50){
+            this.mapRadius -= 50 / (FRAME_RATE*5) ;
         }
         for(let key of Object.keys(this.playerList)){
             let player = this.playerList[key];
@@ -60,7 +60,7 @@ class Room{
             }
             else if(player.survivtime < 100)
                 player.survivtime += 0.2;
-            if(player.survivtime < 0 || distance > this.mapRadius)
+            if((player.survivtime < 0 || distance > this.mapRadius) && player.health >= 0)
                 player.health -= 0.3
         }
         this.processInput();
@@ -120,8 +120,8 @@ class Room{
         for(let index = 0; index < this.bulletList.length; index++){
             let bullet = this.bulletList[index];
             bullet.durationFrame++;
-            bullet.pos.x += bullet.dir.x * bulletVelocity;
-            bullet.pos.y += bullet.dir.y * bulletVelocity;
+            bullet.pos.x += bullet.dir.x * bulletVelocity/FRAME_RATE;
+            bullet.pos.y += bullet.dir.y * bulletVelocity/FRAME_RATE;
             if(bullet.durationFrame == FRAME_RATE * 5){
                 this.bulletList.splice(index, 1);
                 index--;
@@ -135,7 +135,7 @@ class Room{
                 let player = this.playerList[key];
                 if(player.nickname != bullet.owner){
                     let distance = Math.sqrt((player.x - bullet.pos.x) * (player.x - bullet.pos.x) + (player.y - bullet.pos.y) * (player.y - bullet.pos.y));
-                    if(distance <= 16){
+                    if(distance <= 16 && player.health >= 0){
                         console.log(`Collision Detected @${player.nickname}`);
                         player.health -= Math.ceil(Math.random() * 5);
                         this.bulletList.splice(index, 1);

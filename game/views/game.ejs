@@ -47,6 +47,7 @@
                 </div>
             </div>
         </div>
+
         <script>
             var nickname = "<%= session.user.nickname %>";
             
@@ -71,6 +72,7 @@
             var sendBtn = document.getElementById('sendBtn');
             var canvas = document.getElementById('canvas');
             var hpbar = document.getElementById('hpbar');
+
             var socket = io();
             var myInfo;
             var othersInfo;
@@ -122,6 +124,7 @@
                 return ret;
             }
 
+            // Bullet Mode
             canvas.addEventListener('click', (e)=>{
                 let mousePointer = new Vector2(e.offsetX, e.offsetY);
                 mousePointer = mousePointer.add(player.pos.sub(new Vector2(canvas.width/2, canvas.height/2)));
@@ -165,8 +168,6 @@
             socket.on('initialsetting', (initialInfo)=>{
                 let gameStatus = initialInfo.gameStatus;
                 seed = initialInfo.seed;
-
-                console.log(initialInfo);
                 myInfo = gameStatus.me;
                 othersInfo = gameStatus.others;
                 noiseGenerator = new NoiseGenerator(seed);
@@ -186,15 +187,6 @@
                     op.draw();
                 }
                 ctx.restore();
-            });
-
-            socket.on('chat', function(message_node){
-                let itembox = document.querySelectorAll('#chatBox li');
-                let item = document.createElement('li');
-                if(itembox.length == 15)
-                    itembox[0].remove();
-                item.textContent = `${message_node.nickname}: ${message_node.message}`;
-                chatBox.appendChild(item);
             });
 
             socket.on('update', (gameStatus)=>{
@@ -222,6 +214,15 @@
                     bo.draw();
                 }
                 ctx.restore();
+            });
+
+            socket.on('chat', function(message_node){
+                let itembox = document.querySelectorAll('#chatBox li');
+                let item = document.createElement('li');
+                if(itembox.length == 15)
+                    itembox[0].remove();
+                item.textContent = `${message_node.nickname}: ${message_node.message}`;
+                chatBox.appendChild(item);
             });
         </script>
         <script src = "/script/character.js"></script>
